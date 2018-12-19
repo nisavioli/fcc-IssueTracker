@@ -6,19 +6,21 @@
 	"scripts": {
 		"start": "node server.js",
 		"test": "env NODE_ENV=test node server.js",
-		"dev": "nodemon --inspect server.js",
+		"dev": "env NODE_ENV=dev nodemon --inspect server.js",
 		"dev-test": "env NODE_ENV=test nodemon --inspect server.js"
 	},
 	"dependencies": {
-		"express": "^4.14.0",
-		"cors": "^2.8.1",
 		"body-parser": "^1.15.2",
 		"chai": "^4.2.0",
-		"mongodb": "^3.1.10",
 		"chai-http": "^4.2.0",
+		"cors": "^2.8.1",
+		"dotenv": "^6.2.0",
+		"express": "^4.14.0",
+		"helmet": "^3.1.0",
 		"mocha": "^5.2.0",
-		"zombie": "^6.1.4",
-		"helmet": "^3.1.0"
+		"mongodb": "^3.1.10",
+		"mongoose": "^5.4.0",
+		"zombie": "^6.1.4"
 	},
 	"engines": {
 		"node": "4.4.3"

@@ -1,41 +1,36 @@
 /*
-*
-*
-*       Complete the API routing below
-*
-*
-*/
+ *
+ *
+ *       Complete the API routing below
+ *
+ *
+ */
 
-'use strict';
+"use strict";
+const express = require("express");
+const expect = require("chai").expect;
+const controllers = require('../controllers')
+// const mongoose  = require('mongoose');
+// const Issue     = require('../model/issue');
+// const Project   = require('../model/project');
 
-var expect = require('chai').expect;
-var MongoClient = require('mongodb');
-var ObjectId = require('mongodb').ObjectID;
+const router = express.Router();
+const {issue} = controllers;
 
-const CONNECTION_STRING = process.env.DB; //MongoClient.connect(CONNECTION_STRING, function(err, db) {});
-
-module.exports = function (app) {
-
-  app.route('/api/issues/:project')
-  
-    .get(function (req, res){
-      var project = req.params.project;
-      
-    })
-    
-    .post(function (req, res){
-      var project = req.params.project;
-      
-    })
-    
-    .put(function (req, res){
-      var project = req.params.project;
-      
-    })
-    
-    .delete(function (req, res){
-      var project = req.params.project;
-      
-    });
-    
+const controllerHandler = (promise, params) => async (req, res, next) => {
+  const boundParams = params ? params(req, res, next) : [];
+  try {
+    const result = await promise(...boundParams);
+    return res.json(result || { message: "OK" });
+  } catch (error) {
+    return res.status(500) && next(error);
+  }
 };
+const c = controllerHandler;
+
+router.get("/api/issues/:project/", c(issue.getIssues, (req, res, next) => [req, res, next]));
+router.post("/api/issues/:project/", c(issue.createIssue, req => [req.params.project, req.body]));
+router.put("/api/issues/:project/", c(issue.updateIssue, req => [req.params.project, req.body]));
+router.delete("/api/issues/:project/", c(issue.deleteIssue, req => [req.params.project, req.body._id]));
+
+module.exports = router;
