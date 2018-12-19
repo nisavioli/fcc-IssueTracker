@@ -16,20 +16,23 @@ const {
 } = services.issue;
 
 async function getIssues(req, res, next) {
+  let project = await findProject(req.params.project);
+  if(!project) { return null; }
   let filter = qsToFilter(req.query);
-  const pName = req.params.project;
-  let project = await findIssuesByProject(pName, filter);
-  let response = project.issues.map(issue => serialize(issue));
+  let issues = await findIssuesByProject(project, filter);
+  let response = issues.map(issue => serialize(issue));
   return response;
 }
 
 async function createIssue(pName, issue) {
-  let project = await findProject(pName);
-  if (!project) {
-    project = await createNewProject(pName);
-  }
-  let i = deserialize(issue);
-  return serialize(await createNewIssue(i, project));
+let newIssue;
+try{
+  newIssue = await createNewIssue(deserialize(issue), pName);
+} catch(err) {
+  return {'error': 'Missing required fields'};
+}
+return serialize(newIssue);
+
 }
 
 async function updateIssue(pName, params){

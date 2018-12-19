@@ -1,10 +1,12 @@
 const Models = require("../model/db");
 const { Issue, Project } = Models;
 
-function findIssuesByProject(projectName, filter = {}) {
-  return Project.findOne({ name: projectName })
+function findIssuesByProject(project, filter = {}) {
+    return Project.findOne({ name: project.name })
     .populate({ path: "issues", match: filter })
-    .exec();
+    .then(proj => proj.issues, err => err);
+
+    // .exec((err, p) => {return p.issues || err;});
 }
 
 function findProject(projectName) {
@@ -18,14 +20,17 @@ function createNewProject(pName) {
 
 /**
  *@param {Project} project
+ *
  */
-async function createNewIssue(i, project) {
-  issue = await new Issue(i).save();
-  project.issues.push(issue);
-  return project.save();
+async function createNewIssue(i, pName) {
+    issue = new Issue(i);
+    await issue.save();
+    await Project.findOneAndUpdate({name: pName},{'$push': {issues: issue}}, {upsert: true}).exec();
+    return issue;
 }
 
-async function findAndUpdateIssue(id, params) {
+
+function findAndUpdateIssue(id, params) {
   return Issue.findByIdAndUpdate(id, params);
 }
 
@@ -33,9 +38,10 @@ function deleteIssueById(id) {
   return Issue.findByIdAndDelete(id).exec();
 }
 
-function deleteProjectByName(pName){
-	return Project.findOneAndDelete({name: pName}).exec();
+function deleteProjectByName(pName) {
+  return Project.findOneAndDelete({ name: pName }).exec();
 }
+
 
 module.exports = {
   findIssuesByProject,

@@ -22,6 +22,4 @@ function deserialize(i){
 		status: i.status_text
 	};
 }
-
-
-module.exports = {serialize, deserialize};
+module.exports = { serialize, deserialize };
